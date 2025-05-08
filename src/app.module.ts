@@ -22,7 +22,7 @@ import mongoose from 'mongoose';
             return {
             uri,
             connectionFactory: (connection) => {
-                logger.log('MongoDB connection established');
+                logger.log('Connected to MongoDB 🙌🏽💯');
                 return connection;
             },
             };
