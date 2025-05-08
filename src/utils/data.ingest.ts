@@ -14,7 +14,7 @@ export class DataService {
     ) {}
 
     async ingestStructuredData() {
-        const { data } = await axios.get('https://buenro-tech-assessment-materials.s3.eu-north-1.amazonaws.com/structured_generated_data.json');
+        const { data } = await axios.get(process.env.STRUCTURED_DATA_URL);
         await this.structuredModel.insertMany(data);
         return { message: 'Structured data ingested' };
     }
@@ -22,7 +22,7 @@ export class DataService {
     async ingestLargeData() {
         const response = await axios({
         method: 'get',
-        url: 'https://buenro-tech-assessment-materials.s3.eu-north-1.amazonaws.com/large_generated_data.json',
+        url: process.env.LARGE_DATA_URL,
         responseType: 'stream',
         httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         });
