@@ -1,44 +1,41 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 import { Logger } from 'nestjs-pino';
+import mongoose from 'mongoose';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
-
-  // Configuration
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT') || 3000;
-
-  // Logger
-  app.useLogger(app.get(Logger));
-
-  // Global validation
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
-  );
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get<string>('mongoUrl');
+      
+        mongoose.connection.on('connected', () => {
+          console.log(`Successfully connected to MongoDB at ${uri}`);
+        });
+      
+        mongoose.connection.on('error', (err) => {
+          console.error(`MongoDB connection error: ${err.message}`);
+        });
+      
+        mongoose.connection.on('disconnected', () => {
+          console.warn('MongoDB connection disconnected');
+        });
+      
+        return {
+          uri,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    ScheduleModule.forRoot(),
 
-  // Swagger Documentation
-  const config = new DocumentBuilder()
-    .setTitle('Data Ingestion API')
-    .setDescription('API for ingesting and querying JSON data from S3')
-    .setVersion('1.0')
-    .addTag('data')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  ],
+})
 
-  // CORS (adjust as needed)
-  app.enableCors();
-
-  await app.listen(port);
-  app.get(Logger).log(`Application is running on port ${port}`);
-}
-
-bootstrap();
+export class AppModule {}
