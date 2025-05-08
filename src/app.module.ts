@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -12,27 +12,24 @@ import mongoose from 'mongoose';
         MongooseModule.forRootAsync({
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => {
-            const uri = configService.get<string>('mongoUrl');
+            const logger = new Logger('MongoDB');
+            const uri = configService.get<string>('MONGO_URL');
+
             mongoose.connection.on('connected', () => {
-                console.log(`Successfully connected to MongoDB at ${uri}`);
+                logger.log(`Successfully connected to MongoDB`);
             });
-            mongoose.connection.on('error', (err) => {
-              console.error(`MongoDB connection error: ${err.message}`);
-            });
-          
-            mongoose.connection.on('disconnected', () => {
-              console.warn('MongoDB connection disconnected');
-            });
-          
+
             return {
-              uri,
+            uri,
+            connectionFactory: (connection) => {
+                logger.log('MongoDB connection established');
+                return connection;
+            },
             };
-          },
+        },
         inject: [ConfigService],
         }),
         ScheduleModule.forRoot(),
     ],
 })
-
-
 export class AppModule {}
