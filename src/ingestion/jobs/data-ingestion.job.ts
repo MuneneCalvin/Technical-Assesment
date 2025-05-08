@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { S3DownloadService } from '../services/s3-download.service';
 import { UnifiedDataService } from '../../data/services/unified-data.service';
 
@@ -30,5 +31,10 @@ export class DataIngestionJob {
         this.logger.error(`Data ingestion job failed: ${error.message}`);
         throw error;
         }
+    }
+
+    @Cron('0 */6 * * *') // Run every 6 hours
+    async handleCron() {
+        await this.run();
     }
 }
