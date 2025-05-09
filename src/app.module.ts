@@ -1,35 +1,15 @@
-import { Module, Logger } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { PropertiesModule } from './properties/properties.module';
+import { TasksModule } from './tasks/tasks.module';
+import { DataSourcesModule } from './data-sources/data-sources.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ScheduleModule } from '@nestjs/schedule';
-import mongoose from 'mongoose';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-        isGlobal: true,
-        }),
-        MongooseModule.forRootAsync({
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => {
-            const logger = new Logger('MongoDB');
-            const uri = configService.get<string>('MONGO_URL');
-
-            mongoose.connection.on('connected', () => {
-                logger.log(`Successfully connected to MongoDB`);
-            });
-
-            return {
-            uri,
-            connectionFactory: (connection) => {
-                logger.log('Connected to MongoDB 🙌🏽💯');
-                return connection;
-            },
-            };
-        },
-        inject: [ConfigService],
-        }),
-        ScheduleModule.forRoot(),
-    ],
+  imports: [
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/property_db'),
+    PropertiesModule,
+    TasksModule,
+    DataSourcesModule,
+  ],
 })
 export class AppModule {}
