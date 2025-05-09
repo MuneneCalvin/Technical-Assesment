@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Property } from '../common/schemas/property.schema';
 import axios from 'axios';
 import { Readable } from 'stream';
-import { parse } from 'JSONStream';
+import { parse } from 'jsonstream';
 import { pipeline } from 'stream/promises';
 
 @Injectable()
