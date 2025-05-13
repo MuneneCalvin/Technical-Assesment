@@ -29,7 +29,7 @@ export class TasksService implements OnModuleInit {
     try {
       await Promise.all([
         this.dataSourcesService.ingestDataFromSource(
-          'https://buenro-tech-assessment-materials.s3.eu-north1.amazonaws.com/structured_generated_data.json',
+          'https://buenro-tech-assessment-materials.s3.eu-north-1.amazonaws.com/structured_generated_data.json',
           'structured',
         ),
         this.dataSourcesService.ingestDataFromSource(

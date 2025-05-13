@@ -61,8 +61,8 @@ $ npm run test:cov
 - Wait for the datasets to be created in the database.
 - Check for the  below log message in the console, for a successful data copied to the database.
 ```bash
-$ Completed ingestion from large (For the large dataset)
-$ Completed ingestion from small (For the small dataset)
+$ Completed ingestion from large (For the large_generated_data dataset)
+$ Completed ingestion from structured (For the structured_generated_data dataset)
 ```
 
 # API Endpoints
@@ -70,6 +70,12 @@ $ Completed ingestion from small (For the small dataset)
 ```bash
 # Get all the datasets
 $ GET 'http://localhost:3000/properties'
+
+# Get the dataset by name
+$ GET 'http://localhost:3000/properties?name=name'
+
+# Get the dataset by country
+$ GET 'http://localhost:3000/properties?country=country_name'
 
 # Get the dataset by city
 $ GET 'http://localhost:3000/properties?city=city_name'

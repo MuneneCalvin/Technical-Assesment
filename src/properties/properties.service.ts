@@ -29,6 +29,10 @@ export class PropertiesService {
       query.name = { $regex: name, $options: 'i' };
     }
 
+    if (country) {
+      query.country = { $regex: country, $options: 'i' };
+    }
+
     if (city) {
       query.city = { $regex: city, $options: 'i' };
     }
